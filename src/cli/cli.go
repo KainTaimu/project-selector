@@ -3,10 +3,13 @@ package cli
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"strconv"
 
 	"golang.org/x/term"
 )
+
+const clearScreen = "\033[J"
 
 func RunSelector() (err error) {
 	var entries []string
@@ -20,9 +23,6 @@ func RunSelector() (err error) {
 }
 
 func mainLoop(entries []string) (err error) {
-	var in string
-	// var selection int
-
 	for i, entry := range entries {
 		fmt.Printf("(%d): %s", i+1, entry)
 		if i != len(entries)-1 {
@@ -30,12 +30,32 @@ func mainLoop(entries []string) (err error) {
 		}
 	}
 
+	var in string
 	if in, err = getUserInput(); err != nil {
 		return err
 	}
 
-	_, err = strconv.Atoi(in)
+	selection, err := strconv.Atoi(in)
 	if err != nil {
+		return err
+	}
+
+	if selection <= 0 || selection > len(entries) {
+		return nil
+	}
+
+	path := entries[selection-1]
+
+	cmd := exec.Command("/bin/fish", "-C", path)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	fmt.Print("\033[H" + clearScreen)
+	defer func() {
+		fmt.Print("\033[H" + clearScreen)
+	}()
+	if err = cmd.Run(); err != nil {
 		return err
 	}
 
