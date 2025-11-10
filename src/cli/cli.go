@@ -14,6 +14,13 @@ const (
 	shell       = "/bin/fish"
 )
 
+type Color int
+
+const (
+	Green Color = iota
+	Red
+)
+
 func RunSelector() (err error) {
 	var entries []string
 	if entries, err = ReadConfig(); err != nil {
@@ -26,14 +33,7 @@ func RunSelector() (err error) {
 }
 
 func mainLoop(entries []string) (err error) {
-	for i, entry := range entries {
-		s := ColorEntry("(" + strconv.Itoa(i+1) + ")")
-
-		fmt.Printf("%s %s", s, entry)
-		if i != len(entries)-1 {
-			fmt.Printf("\n")
-		}
-	}
+	printEntries(entries, Green)
 
 	var in string
 	if in, err = getUserInput(); err != nil {
@@ -66,6 +66,23 @@ func mainLoop(entries []string) (err error) {
 	}
 
 	return nil
+}
+
+func printEntries(entries []string, color Color) {
+	for i, entry := range entries {
+		var s string
+		switch color {
+		case Green:
+			s = ColorEntry("(" + strconv.Itoa(i+1) + ")")
+		case Red:
+			s = ColorPop("(" + strconv.Itoa(i+1) + ")")
+		}
+
+		fmt.Printf("%s %s", s, entry)
+		if i != len(entries)-1 {
+			fmt.Printf("\n")
+		}
+	}
 }
 
 func getUserInput() (s string, err error) {
