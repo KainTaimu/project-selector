@@ -27,7 +27,9 @@ func RunSelector() (err error) {
 
 func mainLoop(entries []string) (err error) {
 	for i, entry := range entries {
-		fmt.Printf("(%d): %s", i+1, entry)
+		s := ColorEntry("(" + strconv.Itoa(i+1) + ")")
+
+		fmt.Printf("%s %s", s, entry)
 		if i != len(entries)-1 {
 			fmt.Printf("\n")
 		}
@@ -40,7 +42,7 @@ func mainLoop(entries []string) (err error) {
 
 	selection, err := strconv.Atoi(in)
 	if err != nil {
-		return err
+		return nil
 	}
 
 	if selection <= 0 || selection > len(entries) {

@@ -44,12 +44,49 @@ func ReadConfig() (entries []string, err error) {
 		entries = append(entries, entry)
 	}
 
+	if missing := verifyProjectsExists(entries); missing != "" {
+		return nil, fmt.Errorf("invalid entry found: directory '%s' does not exist", missing)
+	}
+
 	return entries, nil
 }
 
+func verifyProjectsExists(paths []string) string {
+	for _, entry := range paths {
+		if !IsDir(entry) {
+			return entry
+		}
+	}
+	return ""
+}
+
 func IsFile(file string) (isFile bool) {
+	if len(file) <= 0 {
+		return false
+	}
+
+	if file[0] == '~' {
+		file = os.Getenv("HOME") + file[1:]
+	}
+
 	if stat, err := os.Stat(file); err == nil {
 		return !stat.IsDir() // Return true if file is not dir
+	} else {
+		return false
+	}
+}
+
+func IsDir(file string) (isDir bool) {
+	if len(file) <= 0 {
+		return false
+	}
+
+	if file[0] == '~' {
+		file = os.Getenv("HOME") + file[1:]
+	}
+
+	if stat, err := os.Stat(file); err == nil {
+		return stat.IsDir()
 	} else {
 		return false
 	}
