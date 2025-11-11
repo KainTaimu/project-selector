@@ -55,7 +55,6 @@ func appendMode() (err error) {
 	if home := os.Getenv("HOME"); strings.HasPrefix(pwd, os.Getenv("HOME")) {
 		pwd = filepath.Join("~", pwd[len(home):])
 	}
-	pwd = pwd + "/"
 
 	projectsFilePath := cli.GetProjectsConfig()
 
