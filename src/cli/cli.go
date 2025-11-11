@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 
 	"golang.org/x/term"
@@ -86,7 +87,7 @@ func startNewBuffer(selection int, entries []string) (err error) {
 		if !exists {
 			return fmt.Errorf("$HOME is not set")
 		}
-		path = home + "/" + path[1:]
+		path = filepath.Join(home, path[1:])
 		if !IsDir(path) {
 			return fmt.Errorf("malformed working dir \"%s\". is $HOME set correctly?", path)
 		}

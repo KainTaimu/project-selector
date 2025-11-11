@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -18,8 +19,8 @@ type Config struct {
 
 func ReadConfig() (entries []string, err error) {
 	configDir := os.Getenv(ConfigHomeEnv) + "/"
-	appConfig := configDir + AppConfigDir
-	projectsPath := appConfig + ProjectEntriesFile
+	appConfig := filepath.Join(configDir, AppConfigDir)
+	projectsPath := filepath.Join(appConfig, ProjectEntriesFile)
 
 	err = os.MkdirAll(appConfig, 0o644)
 	if err != nil {
