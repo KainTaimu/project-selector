@@ -41,6 +41,11 @@ func ReadConfig() (entries []string, err error) {
 	contents := string(file)
 	contents = strings.TrimSpace(contents)
 	for entry := range strings.SplitSeq(contents, "\n") {
+		entry = strings.TrimSpace(entry)
+		if strings.HasPrefix(entry, "#") {
+			continue
+		}
+
 		entries = append(entries, entry)
 	}
 
