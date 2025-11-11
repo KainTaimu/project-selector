@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"project_selector/src/cli"
+
+	"project-selector/src/cli"
 )
 
 type flags struct {

@@ -1,4 +1,4 @@
-module project_selector
+module project-selector
 
 go 1.25.4
 
