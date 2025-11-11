@@ -10,10 +10,6 @@ import (
 	"golang.org/x/term"
 )
 
-const (
-	clearScreen = "\033[J"
-)
-
 type Color int
 
 const (
@@ -94,6 +90,9 @@ func startNewBuffer(selection int, entries []string) (err error) {
 	}
 
 	shell := os.Getenv("SHELL")
+	if !IsFile(shell) {
+		return fmt.Errorf("$SHELL should be a path to file")
+	}
 
 	cmd := exec.Command(shell)
 	cmd.Dir = path
@@ -101,9 +100,9 @@ func startNewBuffer(selection int, entries []string) (err error) {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	fmt.Print("\033[H" + clearScreen)
+	fmt.Print(HomeCursor + ClearScreen)
 	defer func() {
-		fmt.Print("\033[H" + clearScreen)
+		fmt.Print(HomeCursor + ClearScreen)
 	}()
 	if err = cmd.Start(); err != nil {
 		return err
@@ -137,10 +136,10 @@ func getUserInput() (s string, err error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to set terminal to raw: %w", err)
 	}
-	fmt.Print("\033[?25l")
+	fmt.Print(HideCursor)
 	defer func() {
 		_ = term.Restore(int(os.Stdin.Fd()), oldState)
-		fmt.Print("\033[?25h")
+		fmt.Print(ShowCursor)
 	}()
 
 	var buf [1]byte
