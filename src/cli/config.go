@@ -45,6 +45,9 @@ func ReadConfig() (entries []string, err error) {
 		if strings.HasPrefix(entry, "#") {
 			continue
 		}
+		if IsEmptyString(entry) {
+			continue
+		}
 
 		entries = append(entries, entry)
 	}
@@ -95,4 +98,13 @@ func IsDir(file string) (isDir bool) {
 	} else {
 		return false
 	}
+}
+
+func IsEmptyString(s string) bool {
+	for _, c := range s {
+		if c != ' ' {
+			return false
+		}
+	}
+	return true
 }
