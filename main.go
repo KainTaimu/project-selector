@@ -74,16 +74,16 @@ func appendMode() (err error) {
 		return fmt.Errorf("failed to open config stat: %w", err)
 	}
 
-	var s string
+	s := pwd
 	buf := make([]byte, 1)
-	_, err = file.ReadAt(buf, fileLen-1)
-	if err != nil {
-		return fmt.Errorf("failed to read config file tail: %w", err)
-	}
-	if buf[0] == 10 {
-		s = pwd
-	} else {
-		s = "\n" + pwd
+	n, err := file.ReadAt(buf, fileLen-1)
+	if n != 0 {
+		if err != nil {
+			return fmt.Errorf("failed to read config file tail: %w", err)
+		}
+		if buf[0] != '\n' {
+			s = "\n" + pwd
+		}
 	}
 
 	_, err = file.Write([]byte(s))
