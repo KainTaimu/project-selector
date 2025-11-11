@@ -131,6 +131,9 @@ func printEntries(entries []string, color Color) {
 			s = ColorPop("(" + strconv.Itoa(i+1) + ")")
 		}
 
+		entry = ShortenTildeExpansion(entry)
+		entry = filepath.Clean(entry)
+
 		fmt.Printf("%s %s\n", s, entry)
 	}
 }

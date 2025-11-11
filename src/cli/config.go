@@ -64,6 +64,13 @@ func GetProjectsConfig() string {
 	return os.Getenv(ConfigHomeEnv) + "/" + AppConfigDir + ProjectEntriesFile
 }
 
+func ShortenTildeExpansion(entry string) string {
+	if home := os.Getenv("HOME"); strings.HasPrefix(entry, os.Getenv("HOME")) {
+		entry = filepath.Join("~", entry[len(home):])
+	}
+	return entry
+}
+
 func verifyProjectsExists(paths []string) string {
 	for _, entry := range paths {
 		if !IsDir(entry) {

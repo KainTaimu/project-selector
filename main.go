@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
-	"strings"
 
 	"project-selector/src/cli"
 )
@@ -52,9 +50,7 @@ func appendMode() (err error) {
 	if err != nil {
 		return fmt.Errorf("failed to get current working dir: %w", err)
 	}
-	if home := os.Getenv("HOME"); strings.HasPrefix(pwd, os.Getenv("HOME")) {
-		pwd = filepath.Join("~", pwd[len(home):])
-	}
+	pwd = cli.ShortenTildeExpansion(pwd)
 
 	projectsFilePath := cli.GetProjectsConfig()
 
