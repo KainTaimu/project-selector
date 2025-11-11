@@ -5,19 +5,29 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 
 	"project-selector/src/cli"
 )
 
 type flags struct {
-	Edit bool
+	EditMode   bool
+	AppendMode bool
 }
 
 func main() {
 	flags := parseFlags()
 
-	if flags.Edit {
+	if flags.EditMode {
 		if err := editMode(); err != nil {
+			fmt.Printf("%s\n", err.Error())
+			os.Exit(1)
+		}
+	}
+
+	if flags.AppendMode {
+		if err := appendMode(); err != nil {
 			fmt.Printf("%s\n", err.Error())
 			os.Exit(1)
 		}
@@ -37,9 +47,55 @@ func main() {
 	}
 }
 
+func appendMode() (err error) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get current working dir: %w", err)
+	}
+	if home := os.Getenv("HOME"); strings.HasPrefix(pwd, os.Getenv("HOME")) {
+		pwd = filepath.Join("~", pwd[len(home):])
+	}
+
+	projectsFilePath := cli.GetProjectsConfig()
+
+	file, err := os.OpenFile(projectsFilePath, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0o644)
+	if err != nil {
+		return fmt.Errorf("failed to open config: %w", err)
+	}
+	defer func() {
+		_ = file.Close()
+	}()
+
+	var fileLen int64
+	if f, err := file.Stat(); err == nil {
+		fileLen = f.Size()
+	} else {
+		return fmt.Errorf("failed to open config stat: %w", err)
+	}
+
+	var s string
+	buf := make([]byte, 1)
+	_, err = file.ReadAt(buf, fileLen-1)
+	if err != nil {
+		return fmt.Errorf("failed to read config file tail: %w", err)
+	}
+	if buf[0] == 10 {
+		s = pwd
+	} else {
+		s = "\n" + pwd
+	}
+
+	_, err = file.Write([]byte(s))
+	if err != nil {
+		return fmt.Errorf("failed to append to config: %w", err)
+	}
+
+	return nil
+}
+
 func editMode() (err error) {
 	var cmd exec.Cmd
-	projectsFilePath := os.Getenv(cli.ConfigHomeEnv) + "/" + cli.AppConfigDir + cli.ProjectEntriesFile
+	projectsFilePath := cli.GetProjectsConfig()
 
 	if editor, exists := os.LookupEnv("EDITOR"); exists {
 		cmd = *exec.Command(editor, projectsFilePath)
@@ -58,12 +114,14 @@ func editMode() (err error) {
 	return nil
 }
 
-func parseFlags() (flags flags) {
-	edit := flag.Bool("e", false, "Launch an editor set by $EDITOR or $VISUAL")
+func parseFlags() flags {
+	editMode := flag.Bool("e", false, "Launch an editor set by $EDITOR or $VISUAL")
+	appendMode := flag.Bool("a", false, "Append current directory to projects")
 	flag.Parse()
 
-	if *edit {
-		flags.Edit = true
+	flags := flags{
+		*editMode,
+		*appendMode,
 	}
 
 	return flags

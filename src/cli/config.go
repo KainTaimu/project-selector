@@ -59,6 +59,10 @@ func ReadConfig() (entries []string, err error) {
 	return entries, nil
 }
 
+func GetProjectsConfig() string {
+	return os.Getenv(ConfigHomeEnv) + "/" + AppConfigDir + ProjectEntriesFile
+}
+
 func verifyProjectsExists(paths []string) string {
 	for _, entry := range paths {
 		if !IsDir(entry) {
