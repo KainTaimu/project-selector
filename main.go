@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-
 	"project_selector/src/cli"
 )
 
@@ -21,6 +20,14 @@ func main() {
 			fmt.Printf("%s\n", err.Error())
 			os.Exit(1)
 		}
+	}
+
+	if flag.NArg() != 0 {
+		if err := cli.RunQuickJumper(); err != nil {
+			fmt.Printf("%s\n", err.Error())
+			os.Exit(1)
+		}
+		os.Exit(0)
 	}
 
 	if err := cli.RunSelector(); err != nil {

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -32,6 +33,30 @@ func RunSelector() (err error) {
 	return nil
 }
 
+func RunQuickJumper() (err error) {
+	var entries []string
+	if entries, err = ReadConfig(); err != nil {
+		return fmt.Errorf("failed to read config: %w", err)
+	}
+
+	arg := flag.Arg(0)
+
+	selection, err := strconv.Atoi(arg)
+	if err != nil {
+		return nil
+	}
+
+	if selection <= 0 || selection > len(entries) {
+		return nil
+	}
+
+	if err = startNewBuffer(selection, entries); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func mainLoop(entries []string) (err error) {
 	printEntries(entries, Green)
 
@@ -49,6 +74,14 @@ func mainLoop(entries []string) (err error) {
 		return nil
 	}
 
+	if err = startNewBuffer(selection, entries); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func startNewBuffer(selection int, entries []string) (err error) {
 	path := entries[selection-1]
 
 	cmd := exec.Command(shell, "-C", path)
