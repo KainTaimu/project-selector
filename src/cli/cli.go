@@ -53,6 +53,7 @@ func RunQuickJumper() (err error) {
 }
 
 func mainLoop(entries []string) (err error) {
+	fmt.Print(SaveCursor)
 	printEntries(entries, Green)
 
 	var in string
@@ -62,10 +63,12 @@ func mainLoop(entries []string) (err error) {
 
 	selection, err := strconv.Atoi(in)
 	if err != nil {
+		fmt.Print(RestoreCursor + ClearToEnd)
 		return nil
 	}
 
 	if selection <= 0 || selection > len(entries) {
+		fmt.Print(RestoreCursor + ClearToEnd)
 		return nil
 	}
 
