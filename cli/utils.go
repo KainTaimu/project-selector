@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-// GetProjectsConfig returns the path to the main config at "~/.config/project_selector/projects.conf"
-func GetProjectsConfig() string {
-	return filepath.Join(os.Getenv(ConfigHomeEnv), AppConfigDir, ProjectEntriesFile)
+// GetBookmarksFilePath returns the path to the main config at "~/.config/bookmark/bookmarks.conf"
+func GetBookmarksFilePath() string {
+	return filepath.Join(os.Getenv(ConfigHomeEnv), AppConfigDir, BookmarkEntriesFile)
 }
 
 // TildeExpansion attempts to expand the home "~/" string in the front of s into the path set by $HOME.

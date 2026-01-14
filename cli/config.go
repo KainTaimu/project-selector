@@ -8,41 +8,37 @@ import (
 )
 
 const (
-	ConfigHomeEnv      = "XDG_CONFIG_HOME"
-	AppConfigDir       = "project_selector/"
-	ProjectEntriesFile = "projects.conf"
+	ConfigHomeEnv       = "XDG_CONFIG_HOME"
+	AppConfigDir        = "bookmark/"
+	BookmarkEntriesFile = "bookmarks.conf"
 )
-
-type Config struct {
-	Projects []string
-}
 
 type Entry struct {
 	Path    string
 	IsValid bool
 }
 
-// ReadConfig reads the config in "~/.config/project_selector/" and produces a list of Entries from it
+// ReadConfig reads the config in "~/.config/bookmark/" and produces a list of Entries from it
 func ReadConfig() (entries []Entry, err error) {
 	configDir := os.Getenv(ConfigHomeEnv) + "/"
 	appConfig := filepath.Join(configDir, AppConfigDir)
-	projectsPath := filepath.Join(appConfig, ProjectEntriesFile)
+	bookmarksFilePath := filepath.Join(appConfig, BookmarkEntriesFile)
 
-	err = os.MkdirAll(appConfig, 0o644)
+	err = os.MkdirAll(appConfig, 0o777)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create app config directory '%s': %w", appConfig, err)
 	}
 
-	if !IsFile(projectsPath) {
-		_, err = os.Create(projectsPath)
+	if !IsFile(bookmarksFilePath) {
+		_, err = os.Create(bookmarksFilePath)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create projects config '%s': %w", projectsPath, err)
+			return nil, fmt.Errorf("failed to create bookmarks config '%s': %w", bookmarksFilePath, err)
 		}
 	}
 
-	file, err := os.ReadFile(projectsPath)
+	file, err := os.ReadFile(bookmarksFilePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read projects file '%s': %w", projectsPath, err)
+		return nil, fmt.Errorf("failed to read bookmarks file '%s': %w", bookmarksFilePath, err)
 	}
 
 	contents := string(file)

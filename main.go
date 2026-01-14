@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 
-	"project-selector/cli"
+	"bookmark/cli"
 )
 
 type flags struct {
@@ -45,7 +45,7 @@ func main() {
 	}
 }
 
-// Appends the current working directory to the projects config file
+// Appends the current working directory to the bookmarks file
 func appendMode() (err error) {
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -53,11 +53,11 @@ func appendMode() (err error) {
 	}
 	pwd = cli.ShortenTildeExpansion(pwd)
 
-	projectsFilePath := cli.GetProjectsConfig()
+	bookmarksFilePath := cli.GetBookmarksFilePath()
 
-	file, err := os.OpenFile(projectsFilePath, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0o644)
+	file, err := os.OpenFile(bookmarksFilePath, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0o644)
 	if err != nil {
-		return fmt.Errorf("failed to open config: %w", err)
+		return fmt.Errorf("failed to open bookmarks file: %w", err)
 	}
 	defer func() {
 		_ = file.Close()
@@ -94,16 +94,16 @@ func appendMode() (err error) {
 // Runs an editor program like vim provided by environment variable $EDITOR or $VISUAL before continuing to normal behaviour.
 // Returns an error if neither $EDITOR or $VISUAL is set.
 //
-// BUG(Erwin): Editors that run a detached process from the terminal like `code` from VSCode will cause project-selecter to continue to
+// BUG(Erwin): Editors that run a detached process from the terminal like `code` from VSCode will cause bookmark to continue to
 // normal behaviour without waiting for the user to save their changes to the config file.
 func editMode() (err error) {
 	var cmd exec.Cmd
-	projectsFilePath := cli.GetProjectsConfig()
+	bookmarksFilePath := cli.GetBookmarksFilePath()
 
 	if editor, exists := os.LookupEnv("EDITOR"); exists {
-		cmd = *exec.Command(editor, projectsFilePath)
+		cmd = *exec.Command(editor, bookmarksFilePath)
 	} else if editor, exists := os.LookupEnv("VISUAL"); exists {
-		cmd = *exec.Command(editor, projectsFilePath)
+		cmd = *exec.Command(editor, bookmarksFilePath)
 	} else {
 		return fmt.Errorf("no editor available. Set $EDITOR or $VISUAL to your editor")
 	}
@@ -119,7 +119,7 @@ func editMode() (err error) {
 
 func parseFlags() flags {
 	editMode := flag.Bool("e", false, "Launch an editor set by $EDITOR or $VISUAL")
-	appendMode := flag.Bool("a", false, "Append current directory to projects")
+	appendMode := flag.Bool("a", false, "Append current directory to bookmarks file")
 	flag.Parse()
 
 	flags := flags{
