@@ -6,24 +6,28 @@ import (
 	"strings"
 )
 
+// GetProjectsConfig returns the path to the main config at "~/.config/project_selector/projects.conf"
 func GetProjectsConfig() string {
-	return os.Getenv(ConfigHomeEnv) + "/" + AppConfigDir + ProjectEntriesFile
+	return filepath.Join(os.Getenv(ConfigHomeEnv), AppConfigDir, ProjectEntriesFile)
 }
 
-func TildeExpansion(s string) (string, error) {
-	if s[0] == '~' {
+// TildeExpansion attempts to expand the home "~/" string in the front of s into the path set by $HOME.
+// Returns s as-is if "~/" is not the first two characters.
+func TildeExpansion(s string) string {
+	if strings.HasPrefix(s, "~/") {
 		home := os.Getenv("HOME")
 		s = filepath.Join(home, s[1:])
 	}
-	return s, nil
+	return s
 }
 
-func ShortenTildeExpansion(entry string) string {
+// ShortenTildeExpansion attempts to shorten the path s from an absolute path to a relative path from $HOME
+func ShortenTildeExpansion(s string) string {
 	home := os.Getenv("HOME")
-	if strings.HasPrefix(entry, os.Getenv("HOME")) {
-		entry = filepath.Join("~", entry[len(home):])
+	if strings.HasPrefix(s, os.Getenv("HOME")) {
+		s = filepath.Join("~", s[len(home):])
 	}
-	return entry
+	return s
 }
 
 func IsFile(file string) (isFile bool) {
@@ -31,9 +35,7 @@ func IsFile(file string) (isFile bool) {
 		return false
 	}
 
-	if file[0] == '~' {
-		file = os.Getenv("HOME") + file[1:]
-	}
+	file = TildeExpansion(file)
 
 	if stat, err := os.Stat(file); err == nil {
 		return !stat.IsDir() // Return true if file is not dir
@@ -47,9 +49,7 @@ func IsDir(file string) (isDir bool) {
 		return false
 	}
 
-	if file[0] == '~' {
-		file = os.Getenv("HOME") + file[1:]
-	}
+	file = TildeExpansion(file)
 
 	if stat, err := os.Stat(file); err == nil {
 		return stat.IsDir()
@@ -58,6 +58,7 @@ func IsDir(file string) (isDir bool) {
 	}
 }
 
+// IsEmptyString returns true if s only consists of whitespace.
 func IsEmptyString(s string) bool {
 	for _, c := range s {
 		if c != ' ' {

@@ -45,6 +45,7 @@ func main() {
 	}
 }
 
+// Appends the current working directory to the projects config file
 func appendMode() (err error) {
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -69,6 +70,7 @@ func appendMode() (err error) {
 		return fmt.Errorf("failed to open config stat: %w", err)
 	}
 
+	// Add a newline to end of config file
 	s := pwd
 	buf := make([]byte, 1)
 	n, err := file.ReadAt(buf, fileLen-1)
@@ -89,6 +91,11 @@ func appendMode() (err error) {
 	return nil
 }
 
+// Runs an editor program like vim provided by environment variable $EDITOR or $VISUAL before continuing to normal behaviour.
+// Returns an error if neither $EDITOR or $VISUAL is set.
+//
+// BUG(Erwin): Editors that run a detached process from the terminal like `code` from VSCode will cause project-selecter to continue to
+// normal behaviour without waiting for the user to save their changes to the config file.
 func editMode() (err error) {
 	var cmd exec.Cmd
 	projectsFilePath := cli.GetProjectsConfig()

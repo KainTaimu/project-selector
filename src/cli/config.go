@@ -22,6 +22,7 @@ type Entry struct {
 	IsValid bool
 }
 
+// ReadConfig reads the config in "~/.config/project_selector/" and produces a list of Entries from it
 func ReadConfig() (entries []Entry, err error) {
 	configDir := os.Getenv(ConfigHomeEnv) + "/"
 	appConfig := filepath.Join(configDir, AppConfigDir)
@@ -63,13 +64,4 @@ func ReadConfig() (entries []Entry, err error) {
 	}
 
 	return entries, nil
-}
-
-func verifyProjectsExists(paths []string) string {
-	for _, entry := range paths {
-		if !IsDir(entry) {
-			return entry
-		}
-	}
-	return ""
 }

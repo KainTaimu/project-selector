@@ -18,6 +18,7 @@ const (
 	Red
 )
 
+// RunSelector runs the interactive menu to select the directory to jump to
 func RunSelector() (err error) {
 	var entries []Entry
 	if entries, err = ReadConfig(); err != nil {
@@ -29,6 +30,8 @@ func RunSelector() (err error) {
 	return nil
 }
 
+// RunQuickJumper takes the first argument as the index of the directory to jump to as
+// displayed by RunSelector
 func RunQuickJumper() (err error) {
 	fmt.Print(SaveCursor)
 	var entries []Entry
@@ -97,14 +100,11 @@ func checkSelectionIsValid(selection int, entries []Entry) (*Entry, error) {
 }
 
 func startNewBuffer(path string) (err error) {
-	path, err = TildeExpansion(path)
-	if err != nil {
-		return err
-	}
+	path = TildeExpansion(path)
 
 	shell := os.Getenv("SHELL")
 	if !IsFile(shell) {
-		return fmt.Errorf("$SHELL should be a path to file")
+		return fmt.Errorf("$SHELL should be a path to the shell program")
 	}
 
 	cmd := exec.Command(shell)
