@@ -24,6 +24,12 @@ func RunSelector() (err error) {
 	if entries, err = ReadConfig(); err != nil {
 		return fmt.Errorf("failed to read config: %w", err)
 	}
+
+	if len(entries) == 0 {
+		fmt.Println(ColorInvalid("No bookmarks. Pass '-h' for help."))
+		return nil
+	}
+
 	if err = mainLoop(entries); err != nil {
 		return err
 	}

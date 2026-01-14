@@ -34,6 +34,8 @@ func ReadConfig() (entries []Entry, err error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to create bookmarks config '%s': %w", bookmarksFilePath, err)
 		}
+		// Newly created bookmarks file has no entries.
+		return make([]Entry, 0), nil
 	}
 
 	file, err := os.ReadFile(bookmarksFilePath)
