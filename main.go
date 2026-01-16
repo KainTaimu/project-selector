@@ -91,7 +91,9 @@ func appendMode() (err error) {
 	return nil
 }
 
-// Runs an editor program like vim provided by environment variable $EDITOR or $VISUAL before continuing to normal behaviour.
+// Runs an editor program like vim provided by environment variable $VISUAL or $EDITOR, before continuing to normal behaviour after the editor process is stopped.
+// $EDITOR is used first if set, otherwise, $VISUAL is used.
+//
 // Returns an error if neither $EDITOR or $VISUAL is set.
 //
 // BUG(Erwin): Editors that run a detached process from the terminal like `code` from VSCode will cause bookmark to continue to

@@ -1,9 +1,11 @@
-### CLI bookmark tool
+# CLI bookmark tool
+
 Allows for bookmarking directories on the terminal
 
-### Usage
+## Usage
+
 ```bash
-# Create entries. Opens editor specified by $EDITOR or $VISUAL, whichever is first
+# Create entries. Opens editor specified by $EDITOR or $VISUAL, with priority given to $EDITOR
 $ bookmark -e
 
 $ bookmark
@@ -15,7 +17,8 @@ $ pwd
 ~/Projects/bookmark
 ```
 
-### Install
+## Install
+
 ```bash
 $ git clone https://github.com/KainTaimu/bookmark.git
 ...
